@@ -2,7 +2,7 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
-
+const mongoose = require("mongoose");
 const predictRoutes = require("./routes/predict");
 
 const app = express();
@@ -22,4 +22,11 @@ app.use((req, res, next) => {
 
 app.use("/predict", predictRoutes);
 
-app.listen(3000);
+mongoose
+  .connect(
+    "mongodb+srv://sahalnurdin888:VdqXjEbZ5l58gwW6@cluster0.y7olrqd.mongodb.net/results?retryWrites=true&w=majority&appName=Cluster0"
+  )
+  .then(() => {
+    app.listen(5000);
+  })
+  .catch((err) => console.log(err));

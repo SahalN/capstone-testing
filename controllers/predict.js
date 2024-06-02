@@ -1,4 +1,5 @@
 /** @format */
+const { validationResult } = require("express-validator");
 
 exports.getResults = (req, res, next) => {
   res.status(200).json({
@@ -22,15 +23,31 @@ exports.getResults = (req, res, next) => {
 };
 
 exports.createResult = (req, res, next) => {
-  const title = req.body.title;
-  const content = req.body.content;
+  // VALIDATION
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({
+      message: "Validation failed, entered data is incorrect",
+      errors: errors.array(),
+    });
+  }
+  const result = req.body.result;
+  const category = req.body.category;
+  const explanation = req.body.explanation;
+  const suggestion = req.body.suggestion;
   // Create result in db
   res.status(201).json({
     message: "predict created successfully!",
     result: {
       id: new Date().toISOString(),
-      title: title,
-      content: content,
+      result: result,
+      category: category,
+      explanation: explanation,
+      suggestion: suggestion,
+      user: {
+        name: "Budi",
+      },
+      createdAt: new Date(),
     },
   });
 };
