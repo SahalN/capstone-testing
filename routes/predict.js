@@ -3,15 +3,17 @@
 const express = require("express");
 const { body } = require("express-validator");
 const predictController = require("../controllers/predict");
+const isAuth = require("../middleware/is-auth");
 
 const router = express.Router();
 
 // GET /predict/results
-router.get("/results", predictController.getResults);
+router.get("/results", isAuth, predictController.getResults);
 
 // POST /predict/result
 router.post(
   "/result",
+  isAuth,
   [
     body("result").trim().isLength({ min: 5 }),
     body("category").trim().isLength({ min: 3 }),
@@ -22,9 +24,9 @@ router.post(
 );
 
 // GET /predict/result/resultId
-router.get("/result/:resultId", predictController.getResult);
+router.get("/result/:resultId", isAuth, predictController.getResult);
 
 // DELETE /predict/result/resultId
-router.delete("/result/:resultId", predictController.deleteResult);
+router.delete("/result/:resultId", isAuth, predictController.deleteResult);
 
 module.exports = router;

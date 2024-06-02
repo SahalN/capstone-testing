@@ -63,7 +63,7 @@ exports.login = (req, res, next) => {
       }
       const token = jwt.sign(
         { email: loadedUser.email, userId: loadedUser._id.toString() },
-        "C241PS458",
+        "testing", //C241PS458
         { expiresIn: "1h" }
       );
       res.status(200).json({
