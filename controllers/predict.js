@@ -3,24 +3,19 @@ const { validationResult } = require("express-validator");
 const Result = require("../models/result");
 
 exports.getResults = (req, res, next) => {
-  res.status(200).json({
-    results: [
-      {
-        _id: "1",
-        result: "Melanocytic nevi",
-        category: "Cancer",
-        explanation:
-          "Melanocytic nevi atau tahi lalat biasanya tidak memerlukan pengobatan  kecuali ada kekhawatiran tentang perubahan menjadi kanker kulit seperti  melanoma.",
-        suggestion:
-          "Pengobatan yang disarankan meliputi pemantauan rutin untuk perubahan  ukuran, bentuk, atau warna; biopsi jika ada kecurigaan; pengangkatan  bedah untuk tahi lalat yang mencurigakan atau teriritasi; dan  pemeriksaan dermatologi digital menggunakan dermatoskopi. Konsultasi  dengan dokter kulit sangat penting untuk diagnosis dan pengobatan yang  tepat.",
-        imageUrl: "images/cancer-1.png",
-        user: {
-          name: "Budi",
-        },
-        createdAt: new Date(),
-      },
-    ],
-  });
+  Result.find()
+    .then((results) => {
+      res.status(200).json({
+        message: "Fetched posts successfully.",
+        results: results,
+      });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
 };
 
 exports.createResult = (req, res, next) => {
@@ -53,6 +48,28 @@ exports.createResult = (req, res, next) => {
       res.status(201).json({
         message: "Result created successfully!",
         resultDb: resultDb,
+      });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+exports.getResult = (req, res, next) => {
+  const resultId = req.params.resultId;
+  Result.findById(resultId)
+    .then((result) => {
+      if (!result) {
+        const error = new Error("Could not find result.");
+        error.statusCode = 404;
+        throw error;
+      }
+      res.status(200).json({
+        message: "Post fetched.",
+        result: result,
       });
     })
     .catch((err) => {

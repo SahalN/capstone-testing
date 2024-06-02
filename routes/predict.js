@@ -21,4 +21,7 @@ router.post(
   predictController.createResult
 );
 
+// GET /predict/result/resultId
+router.get("/result/:resultId", predictController.getResult);
+
 module.exports = router;
