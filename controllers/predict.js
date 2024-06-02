@@ -26,6 +26,13 @@ exports.createResult = (req, res, next) => {
     error.statusCode = 422;
     throw error;
   }
+  if (!req.file) {
+    const error = new Error("No image provided.");
+    error.statusCode = 422;
+    throw error;
+  }
+  /** REPLACE ALL '\' WITH '/' */
+  const imageUrl = req.file.path.replace("\\", "/");
   const result = req.body.result;
   const category = req.body.category;
   const explanation = req.body.explanation;
@@ -36,7 +43,7 @@ exports.createResult = (req, res, next) => {
     category: category,
     explanation: explanation,
     suggestion: suggestion,
-    imageUrl: "images/cancer-1.png",
+    imageUrl: imageUrl,
     user: {
       name: "Budi",
     },
@@ -68,7 +75,7 @@ exports.getResult = (req, res, next) => {
         throw error;
       }
       res.status(200).json({
-        message: "Post fetched.",
+        message: "Result fetched.",
         result: result,
       });
     })
