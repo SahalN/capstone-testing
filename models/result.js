@@ -25,7 +25,7 @@ const resultSchema = new Schema(
       type: String,
       required: true,
     },
-    creator: {
+    user: {
       type: Object,
       required: true,
     },

@@ -1,5 +1,6 @@
 /** @format */
 const { validationResult } = require("express-validator");
+const Result = require("../models/result");
 
 exports.getResults = (req, res, next) => {
   res.status(200).json({
@@ -36,18 +37,26 @@ exports.createResult = (req, res, next) => {
   const explanation = req.body.explanation;
   const suggestion = req.body.suggestion;
   // Create result in db
-  res.status(201).json({
-    message: "predict created successfully!",
-    result: {
-      id: new Date().toISOString(),
-      result: result,
-      category: category,
-      explanation: explanation,
-      suggestion: suggestion,
-      user: {
-        name: "Budi",
-      },
-      createdAt: new Date(),
+  const resultDb = new Result({
+    result: result,
+    category: category,
+    explanation: explanation,
+    suggestion: suggestion,
+    imageUrl: "images/cancer-1.png",
+    user: {
+      name: "Budi",
     },
   });
+  resultDb
+    .save()
+    .then((result) => {
+      console.log(result);
+      res.status(201).json({
+        message: "Post created successfully!",
+        resultDb: resultDb,
+      });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };

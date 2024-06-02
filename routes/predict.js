@@ -1,8 +1,9 @@
 /** @format */
 
 const express = require("express");
-const predictController = require("../controllers/predict");
 const { body } = require("express-validator");
+const predictController = require("../controllers/predict");
+
 const router = express.Router();
 
 // GET /predict/results
