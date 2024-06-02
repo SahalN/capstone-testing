@@ -3,9 +3,10 @@ const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const predictRoutes = require("./routes/predict");
 const { v4: uuidv4 } = require("uuid");
 const multer = require("multer");
+const predictRoutes = require("./routes/predict");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 
@@ -52,12 +53,14 @@ app.use((req, res, next) => {
 });
 
 app.use("/predict", predictRoutes);
+app.use("/auth", authRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);
   const status = error.statusCode;
   const message = error.message;
-  res.status(status).json({ message: message });
+  const data = error.data;
+  res.status(status).json({ message: message, data: data });
 });
 
 mongoose
