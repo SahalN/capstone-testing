@@ -1,8 +1,8 @@
 /** @format */
 
-exports.getPosts = (req, res, next) => {
+exports.getResults = (req, res, next) => {
   res.status(200).json({
-    posts: [
+    results: [
       {
         _id: "1",
         result: "Melanocytic nevi",
@@ -21,13 +21,13 @@ exports.getPosts = (req, res, next) => {
   });
 };
 
-exports.createPost = (req, res, next) => {
+exports.createResult = (req, res, next) => {
   const title = req.body.title;
   const content = req.body.content;
-  // Create post in db
+  // Create result in db
   res.status(201).json({
     message: "predict created successfully!",
-    post: {
+    result: {
       id: new Date().toISOString(),
       title: title,
       content: content,
