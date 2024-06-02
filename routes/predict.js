@@ -6,10 +6,10 @@ const predictController = require("../controllers/predict");
 
 const router = express.Router();
 
-// GET /predict/posts
-router.get("/posts", predictController.getPosts);
+// GET /predict/results
+router.get("/results", predictController.getPosts);
 
-// POST /predict/post
-router.post("/post", predictController.createPost);
+// POST /predict/result
+router.post("/result", predictController.createPost);
 
 module.exports = router;

@@ -22,4 +22,4 @@ app.use((req, res, next) => {
 
 app.use("/predict", predictRoutes);
 
-app.listen(8080);
+app.listen(3000);

@@ -2,7 +2,22 @@
 
 exports.getPosts = (req, res, next) => {
   res.status(200).json({
-    posts: [{ title: "First Post", content: "This is the first predict!" }],
+    posts: [
+      {
+        _id: "1",
+        result: "Melanocytic nevi",
+        category: "Cancer",
+        explanation:
+          "Melanocytic nevi atau tahi lalat biasanya tidak memerlukan pengobatan  kecuali ada kekhawatiran tentang perubahan menjadi kanker kulit seperti  melanoma.",
+        suggestion:
+          "Pengobatan yang disarankan meliputi pemantauan rutin untuk perubahan  ukuran, bentuk, atau warna; biopsi jika ada kecurigaan; pengangkatan  bedah untuk tahi lalat yang mencurigakan atau teriritasi; dan  pemeriksaan dermatologi digital menggunakan dermatoskopi. Konsultasi  dengan dokter kulit sangat penting untuk diagnosis dan pengobatan yang  tepat.",
+        imageUrl: "images/cancer-1.png",
+        user: {
+          name: "Budi",
+        },
+        createdAt: new Date(),
+      },
+    ],
   });
 };
 
