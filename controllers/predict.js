@@ -1,4 +1,6 @@
 /** @format */
+const fs = require("fs");
+const path = require("path");
 const { validationResult } = require("express-validator");
 const Result = require("../models/result");
 
@@ -85,4 +87,34 @@ exports.getResult = (req, res, next) => {
       }
       next(err);
     });
+};
+
+exports.deleteResult = (req, res, next) => {
+  const resultId = req.params.resultId;
+  Result.findById(resultId)
+    .then((result) => {
+      if (!result) {
+        const error = new Error("Could not find result.");
+        error.statusCode = 404;
+        throw error;
+      }
+      //CHECK LOGGED IN USER
+      clearImage(result.imageUrl);
+      return Result.findByIdAndDelete(resultId);
+    })
+    .then((result) => {
+      console.log(result);
+      res.status(200).json({ message: "Deleted result." });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
+
+const clearImage = (filePath) => {
+  filePath = path.join(__dirname, "..", filePath);
+  fs.unlink(filePath, (err) => console.log(err));
 };

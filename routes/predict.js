@@ -24,4 +24,7 @@ router.post(
 // GET /predict/result/resultId
 router.get("/result/:resultId", predictController.getResult);
 
+// DELETE /predict/result/resultId
+router.delete("/result/:resultId", predictController.deleteResult);
+
 module.exports = router;
