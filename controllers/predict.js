@@ -106,13 +106,24 @@ exports.deleteResult = (req, res, next) => {
         error.statusCode = 404;
         throw error;
       }
+      if (result.user.toString() !== req.userId) {
+        const error = new Error("Not authorized!");
+        error.statusCode = 403;
+        throw error;
+      }
       //CHECK LOGGED IN USER
       clearImage(result.imageUrl);
       return Result.findByIdAndDelete(resultId);
     })
     .then((result) => {
-      console.log(result);
-      res.status(200).json({ message: "Deleted result." });
+      return User.findById(req.userId);
+    })
+    .then((user) => {
+      user.results.pull(resultId);
+      return user.save();
+    })
+    .then((result) => {
+      res.status(200).json({ message: "Deleted Result." });
     })
     .catch((err) => {
       if (!err.statusCode) {
