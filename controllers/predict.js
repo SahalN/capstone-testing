@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const { validationResult } = require("express-validator");
 const Result = require("../models/result");
+const User = require("../models/user");
 
 exports.getResults = (req, res, next) => {
   Result.find()
@@ -39,6 +40,7 @@ exports.createResult = (req, res, next) => {
   const category = req.body.category;
   const explanation = req.body.explanation;
   const suggestion = req.body.suggestion;
+  let user;
   // Create result in db
   const resultDb = new Result({
     result: result,
@@ -46,17 +48,23 @@ exports.createResult = (req, res, next) => {
     explanation: explanation,
     suggestion: suggestion,
     imageUrl: imageUrl,
-    user: {
-      name: "Budi",
-    },
+    user: req.userId,
   });
   resultDb
     .save()
     .then((result) => {
-      console.log(result);
+      return User.findById(req.userId);
+    })
+    .then((user1) => {
+      user = user1;
+      user.results.push(resultDb);
+      return user.save();
+    })
+    .then((result) => {
       res.status(201).json({
         message: "Result created successfully!",
         resultDb: resultDb,
+        user: { _id: user._id, name: user.name },
       });
     })
     .catch((err) => {

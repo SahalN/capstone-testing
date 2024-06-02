@@ -26,8 +26,9 @@ const resultSchema = new Schema(
       required: true,
     },
     user: {
-      type: Object,
-      required: true,
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      require: true,
     },
   },
   { timestamps: true }
