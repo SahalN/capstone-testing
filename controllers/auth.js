@@ -15,7 +15,7 @@ exports.signup = (req, res, next) => {
     throw error;
   }
   const email = req.body.email;
-  const name = req.body.name;
+  const username = req.body.username;
   const password = req.body.password;
   bcrypt
     .hash(password, 12)
@@ -23,7 +23,7 @@ exports.signup = (req, res, next) => {
       const user = new User({
         email: email,
         password: hashedPw,
-        name: name,
+        username: username,
       });
       return user.save();
     })
