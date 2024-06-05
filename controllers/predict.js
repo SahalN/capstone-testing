@@ -38,13 +38,13 @@ exports.createResult = (req, res, next) => {
   const imageUrl = req.file.path.replace("\\", "/");
   const result = req.body.result;
   const explanation = req.body.explanation;
-  const suggestion = req.body.suggestion;
+  const firstAidRecommendation = req.body.firstAidRecommendation;
   let user;
   // Create result in db
   const resultDb = new Result({
     result: result,
     explanation: explanation,
-    suggestion: suggestion,
+    firstAidRecommendation: firstAidRecommendation,
     imageUrl: imageUrl,
     user: req.userId,
   });

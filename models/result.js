@@ -17,7 +17,7 @@ const resultSchema = new Schema(
       type: String,
       required: true,
     },
-    suggestion: {
+    firstAidRecommendation: {
       type: String,
       required: true,
     },

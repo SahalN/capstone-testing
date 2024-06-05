@@ -17,7 +17,7 @@ router.post(
   [
     body("result").trim().isLength({ min: 5 }),
     body("explanation").trim().isLength({ min: 5 }),
-    body("suggestion").trim().isLength({ min: 5 }),
+    body("firstAidRecommendation").trim().isLength({ min: 5 }),
   ],
   predictController.createResult
 );
