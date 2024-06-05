@@ -13,10 +13,6 @@ const resultSchema = new Schema(
       type: String,
       required: true,
     },
-    category: {
-      type: String,
-      required: true,
-    },
     explanation: {
       type: String,
       required: true,
