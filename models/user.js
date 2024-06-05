@@ -16,6 +16,15 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  age: {
+    type: Number,
+    default: null,
+  },
+  gender: {
+    type: String,
+    enum: ["male", "female", "other"],
+    default: null,
+  },
   status: {
     type: String,
     default: "Created new account!",

@@ -78,3 +78,41 @@ exports.login = (req, res, next) => {
       next(err);
     });
 };
+
+exports.updateProfile = (req, res, next) => {
+  const userId = req.userId; // Assuming userId is stored in the request after authentication middleware
+  const { age, gender, username } = req.body;
+
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        const error = new Error("User not found.");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      if (username) {
+        user.username = username;
+      }
+      if (age !== undefined) {
+        user.age = age;
+      }
+      if (gender) {
+        user.gender = gender;
+      }
+
+      return user.save();
+    })
+    .then((result) => {
+      res.status(200).json({
+        message: "User profile updated!",
+        user: result,
+      });
+    })
+    .catch((err) => {
+      if (!err.statusCode) {
+        err.statusCode = 500;
+      }
+      next(err);
+    });
+};
