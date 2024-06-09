@@ -4,6 +4,8 @@ const path = require("path");
 const { validationResult } = require("express-validator");
 const Result = require("../models/result");
 const User = require("../models/user");
+const generateContentWithLabel = require("../services/geminiResponse");
+const predictClassification = require("../services/inferenceService");
 
 exports.getResults = (req, res, next) => {
   Result.find()
@@ -21,56 +23,68 @@ exports.getResults = (req, res, next) => {
     });
 };
 
-exports.createResult = (req, res, next) => {
-  // VALIDATION
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error("Validation failed, entered data is incorrect.");
-    error.statusCode = 422;
-    throw error;
-  }
-  if (!req.file) {
-    const error = new Error("No image provided.");
-    error.statusCode = 422;
-    throw error;
-  }
-  /** REPLACE ALL '\' WITH '/' */
-  const imageUrl = req.file.path.replace("\\", "/");
-  const result = req.body.result;
-  const explanation = req.body.explanation;
-  const firstAidRecommendation = req.body.firstAidRecommendation;
-  let user;
-  // Create result in db
-  const resultDb = new Result({
-    result: result,
-    explanation: explanation,
-    firstAidRecommendation: firstAidRecommendation,
-    imageUrl: imageUrl,
-    user: req.userId,
-  });
-  resultDb
-    .save()
-    .then((result) => {
-      return User.findById(req.userId);
-    })
-    .then((user1) => {
-      user = user1;
-      user.results.push(resultDb);
-      return user.save();
-    })
-    .then((result) => {
-      res.status(201).json({
-        message: "Result created successfully!",
-        resultDb: resultDb,
-        user: { _id: user._id, username: user.username },
-      });
-    })
-    .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
+exports.createResult = async (req, res, next) => {
+  try {
+    // VALIDATION
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error("Validation failed, entered data is incorrect.");
+      error.statusCode = 422;
+      throw error;
+    }
+    if (!req.file) {
+      const error = new Error("No image provided.");
+      error.statusCode = 422;
+      throw error;
+    }
+    // REPLACE ALL '\' WITH '/'
+    const imageUrl = req.file.path.replace("\\", "/");
+    const { model } = req.app.locals;
+
+    // Read the image file
+    const imageBuffer = fs.readFileSync(req.file.path);
+
+    // Make prediction
+    const { confidenceScore, label } = await predictClassification(
+      model,
+      imageBuffer
+    );
+    const { explanation, firstAidRecommendation } =
+      await generateContentWithLabel(label);
+
+    // Create result in db
+    const resultDb = new Result({
+      result: label,
+      explanation: explanation,
+      firstAidRecommendation: firstAidRecommendation,
+      confidenceScore: confidenceScore,
+      imageUrl: imageUrl,
+      user: req.userId,
     });
+
+    await resultDb.save();
+    const user = await User.findById(req.userId);
+
+    if (!user) {
+      const error = new Error("User not found.");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    user.results.push(resultDb);
+    await user.save();
+
+    res.status(201).json({
+      message: "Result created successfully!",
+      resultDb: resultDb,
+      user: { _id: user._id, username: user.username },
+    });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
 };
 
 exports.getResult = (req, res, next) => {

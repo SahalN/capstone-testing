@@ -7,6 +7,8 @@ const { v4: uuidv4 } = require("uuid");
 const multer = require("multer");
 const predictRoutes = require("./routes/predict");
 const authRoutes = require("./routes/auth");
+require("dotenv").config();
+const loadModel = require("./services/loadModel");
 
 const app = express();
 
@@ -23,23 +25,21 @@ const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "image/png" ||
     file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/gif" ||
+    file.mimetype === "image/bmp"
   ) {
     cb(null, true);
   } else {
     cb(null, false);
   }
 };
-
-// app.use(bodyParser.urlEncoded()); // x-www-form-urlencoded <form>
 app.use(bodyParser.json()); // application/json
 
-// MULTER
 app.use(
   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
 );
 
-// STATIC IMAGES
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
@@ -57,17 +57,27 @@ app.use("/auth", authRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);
-  const status = error.statusCode;
+  const status = error.statusCode || 500;
   const message = error.message;
   const data = error.data;
   res.status(status).json({ message: message, data: data });
 });
 
-mongoose
-  .connect(
-    "mongodb+srv://sahalnurdin888:KvRvtPWia177LFE9@cluster0.y7olrqd.mongodb.net/results?retryWrites=true&w=majority&appName=Cluster0"
-  )
-  .then(() => {
-    app.listen(5000);
-  })
-  .catch((err) => console.log(err));
+const startServer = async () => {
+  try {
+    const model = await loadModel();
+    app.locals.model = model;
+
+    const port = process.env.PORT || 3000;
+    const mongodbUri = process.env.MONGODB_URI;
+
+    await mongoose.connect(mongodbUri);
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+    });
+  } catch (err) {
+    console.error("Failed to start server:", err);
+  }
+};
+
+startServer();

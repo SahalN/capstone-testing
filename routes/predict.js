@@ -11,16 +11,7 @@ const router = express.Router();
 router.get("/results", isAuth, predictController.getResults);
 
 // POST /predict/result
-router.post(
-  "/result",
-  isAuth,
-  [
-    body("result").trim().isLength({ min: 5 }),
-    body("explanation").trim().isLength({ min: 5 }),
-    body("firstAidRecommendation").trim().isLength({ min: 5 }),
-  ],
-  predictController.createResult
-);
+router.post("/result", isAuth, predictController.createResult);
 
 // GET /predict/result/resultId
 router.get("/result/:resultId", isAuth, predictController.getResult);
