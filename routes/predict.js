@@ -1,9 +1,9 @@
 /** @format */
-
 const express = require("express");
 const { body } = require("express-validator");
 const predictController = require("../controllers/predict");
 const isAuth = require("../middleware/is-auth");
+const imgUpload = require("../modules/imgUpload");
 
 const router = express.Router();
 

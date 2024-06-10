@@ -1,4 +1,5 @@
 /** @format */
+
 const fs = require("fs");
 const path = require("path");
 const { validationResult } = require("express-validator");
@@ -39,15 +40,13 @@ exports.createResult = async (req, res, next) => {
     }
     // REPLACE ALL '\' WITH '/'
     const imageUrl = req.file.path.replace("\\", "/");
+
     const { model } = req.app.locals;
 
-    // Read the image file
-    const imageBuffer = fs.readFileSync(req.file.path);
-
-    // Make prediction
+    // Make prediction using the image file path
     const { confidenceScore, label } = await predictClassification(
       model,
-      imageBuffer
+      req.file.path
     );
     const { explanation, firstAidRecommendation } =
       await generateContentWithLabel(label);

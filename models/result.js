@@ -21,6 +21,10 @@ const resultSchema = new Schema(
       type: String,
       required: true,
     },
+    confidenceScore: {
+      type: Number,
+      required: true,
+    },
     user: {
       type: Schema.Types.ObjectId,
       ref: "User",

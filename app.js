@@ -20,7 +20,6 @@ const fileStorage = multer.diskStorage({
     cb(null, uuidv4());
   },
 });
-
 const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "image/png" ||
@@ -51,7 +50,6 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
-
 app.use("/predict", predictRoutes);
 app.use("/auth", authRoutes);
 

@@ -1,16 +1,18 @@
 /** @format */
-
 const tf = require("@tensorflow/tfjs-node");
+const fs = require("fs");
 
-async function predictClassification(model, imageBuffer) {
+async function predictClassification(model, imagePath) {
   try {
+    // Read the image file
+    const imageBuffer = fs.readFileSync(imagePath);
+
     // Decode the image buffer and preprocess it
     const imageTensor = tf.node
-      .decodeImage(imageBuffer, 3) // Decode with 3 channels (RGB)
-      .resizeNearestNeighbor([224, 224]) // Resize to match model input shape
+      .decodeImage(imageBuffer)
+      .resizeBilinear([224, 224]) // Resize to match model input shape
       .expandDims() // Add batch dimension
-      .toFloat()
-      .div(tf.scalar(255)); // Scale pixel values to [0, 1]
+      .toFloat();
 
     // Make prediction
     const prediction = model.predict(imageTensor);
@@ -25,6 +27,8 @@ async function predictClassification(model, imageBuffer) {
 
     const classResult = tf.argMax(prediction, 1).dataSync()[0];
     const label = classes[classResult];
+    console.log(label);
+    console.log(confidenceScore);
 
     return { confidenceScore, label };
   } catch (error) {
