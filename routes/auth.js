@@ -24,6 +24,16 @@ router.put(
       .normalizeEmail(),
     body("password").trim().isLength({ min: 5 }),
     body("username").trim().not().isEmpty(),
+    body("dateOfBirth")
+      .isISO8601()
+      .toDate()
+      .withMessage("Please enter a valid date of birth."),
+    body("weight")
+      .isFloat({ min: 0 })
+      .withMessage("Please enter a valid weight."),
+    body("gender")
+      .isIn(["male", "female", "other"])
+      .withMessage("Please enter a valid gender."),
   ],
   authController.signup
 );
@@ -48,6 +58,10 @@ router.put(
       .isString()
       .isIn(["male", "female", "other"])
       .withMessage("Please enter a valid gender."),
+    body("weight")
+      .optional()
+      .isFloat({ min: 0 })
+      .withMessage("Please enter a valid weight."),
   ],
   isAuth,
   authController.updateProfile
@@ -62,6 +76,20 @@ router.get("/profile", isAuth, (req, res, next) => {
         const error = new Error("User not found.");
         error.statusCode = 404;
         throw error;
+      }
+      // Hitung ulang umur jika tanggal lahir tersedia
+      if (user.dateOfBirth) {
+        const today = new Date();
+        const birthDate = new Date(user.dateOfBirth);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
+          age--;
+        }
+        user.age = age;
       }
 
       let message = "User information retrieved successfully.";

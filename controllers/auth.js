@@ -14,9 +14,7 @@ exports.signup = (req, res, next) => {
     error.data = errors.array();
     throw error;
   }
-  const email = req.body.email;
-  const username = req.body.username;
-  const password = req.body.password;
+  const { email, username, password, dateOfBirth, weight, gender } = req.body;
   bcrypt
     .hash(password, 12)
     .then((hashedPw) => {
@@ -24,6 +22,9 @@ exports.signup = (req, res, next) => {
         email: email,
         password: hashedPw,
         username: username,
+        dateOfBirth: dateOfBirth,
+        weight: weight,
+        gender: gender,
       });
       return user.save();
     })
@@ -63,7 +64,7 @@ exports.login = (req, res, next) => {
       }
       const token = jwt.sign(
         { email: loadedUser.email, userId: loadedUser._id.toString() },
-        "testing", //C241PS458
+        "C241PS458",
         { expiresIn: "1h" }
       );
       res.status(200).json({
@@ -80,8 +81,8 @@ exports.login = (req, res, next) => {
 };
 
 exports.updateProfile = (req, res, next) => {
-  const userId = req.userId; // Assuming userId is stored in the request after authentication middleware
-  const { age, gender, username } = req.body;
+  const userId = req.userId;
+  const { dateOfBirth, gender, username, weight } = req.body;
 
   User.findById(userId)
     .then((user) => {
@@ -94,11 +95,28 @@ exports.updateProfile = (req, res, next) => {
       if (username) {
         user.username = username;
       }
-      if (age !== undefined) {
+      if (dateOfBirth) {
+        // Update tanggal lahir dengan yang baru
+        user.dateOfBirth = dateOfBirth;
+
+        // Hitung umur berdasarkan tanggal lahir yang baru
+        const today = new Date();
+        const birthDate = new Date(dateOfBirth);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (
+          monthDiff < 0 ||
+          (monthDiff === 0 && today.getDate() < birthDate.getDate())
+        ) {
+          age--;
+        }
         user.age = age;
       }
       if (gender) {
         user.gender = gender;
+      }
+      if (weight !== undefined) {
+        user.weight = weight;
       }
 
       return user.save();
