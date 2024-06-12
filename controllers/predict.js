@@ -7,7 +7,6 @@ const Result = require("../models/result");
 const User = require("../models/user");
 const generateContentWithLabel = require("../services/geminiResponse");
 const predictClassification = require("../services/inferenceService");
-
 exports.getResults = (req, res, next) => {
   Result.find()
     .then((results) => {
@@ -23,7 +22,6 @@ exports.getResults = (req, res, next) => {
       next(err);
     });
 };
-
 exports.createResult = async (req, res, next) => {
   try {
     // VALIDATION
@@ -50,7 +48,6 @@ exports.createResult = async (req, res, next) => {
     );
     const { explanation, firstAidRecommendation } =
       await generateContentWithLabel(label);
-
     // Create result in db
     const resultDb = new Result({
       result: label,
@@ -60,19 +57,15 @@ exports.createResult = async (req, res, next) => {
       imageUrl: imageUrl,
       user: req.userId,
     });
-
     await resultDb.save();
     const user = await User.findById(req.userId);
-
     if (!user) {
       const error = new Error("User not found.");
       error.statusCode = 404;
       throw error;
     }
-
     user.results.push(resultDb);
     await user.save();
-
     res.status(201).json({
       message: "Result created successfully!",
       resultDb: resultDb,
@@ -85,7 +78,6 @@ exports.createResult = async (req, res, next) => {
     next(err);
   }
 };
-
 exports.getResult = (req, res, next) => {
   const resultId = req.params.resultId;
   Result.findById(resultId)
@@ -107,7 +99,6 @@ exports.getResult = (req, res, next) => {
       next(err);
     });
 };
-
 exports.deleteResult = (req, res, next) => {
   const resultId = req.params.resultId;
   Result.findById(resultId)
@@ -143,7 +134,6 @@ exports.deleteResult = (req, res, next) => {
       next(err);
     });
 };
-
 const clearImage = (filePath) => {
   filePath = path.join(__dirname, "..", filePath);
   fs.unlink(filePath, (err) => console.log(err));

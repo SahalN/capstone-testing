@@ -8,6 +8,7 @@ const multer = require("multer");
 const predictRoutes = require("./routes/predict");
 const authRoutes = require("./routes/auth");
 require("dotenv").config();
+
 const loadModel = require("./services/loadModel");
 
 const app = express();
@@ -67,6 +68,7 @@ const startServer = async () => {
     app.locals.model = model;
 
     const port = process.env.PORT || 3000;
+
     const mongodbUri = process.env.MONGODB_URI;
 
     await mongoose.connect(mongodbUri);
