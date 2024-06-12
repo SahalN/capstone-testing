@@ -46,8 +46,11 @@ exports.createResult = async (req, res, next) => {
       model,
       req.file.path
     );
+
+    const userId = req.userId;
+
     const { explanation, firstAidRecommendation } =
-      await generateContentWithLabel(label);
+      await generateContentWithLabel(label, userId);
     // Create result in db
     const resultDb = new Result({
       result: label,
