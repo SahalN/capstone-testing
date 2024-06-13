@@ -1,5 +1,4 @@
 /** @format */
-
 const { Storage } = require("@google-cloud/storage");
 const path = require("path");
 
@@ -24,7 +23,9 @@ let ImgUpload = {};
 ImgUpload.uploadToGcs = (req, res, next) => {
   if (!req.file) return next();
 
-  const gcsname = new Date().toISOString().replace(/[-:.]/g, "");
+  const gcsname =
+    new Date().toISOString().replace(/[-:.]/g, "") +
+    path.extname(req.file.originalname);
   const file = bucket.file(gcsname);
 
   const stream = file.createWriteStream({

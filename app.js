@@ -13,14 +13,17 @@ const loadModel = require("./services/loadModel");
 
 const app = express();
 
-const fileStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "images");
-  },
-  filename: function (req, file, cb) {
-    cb(null, uuidv4());
-  },
-});
+const storage = multer.memoryStorage(); // Memory storage untuk menggunakan buffer
+
+// const fileStorage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     cb(null, "images");
+//   },
+//   filename: function (req, file, cb) {
+//     cb(null, uuidv4());
+//   },
+// });
+
 const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "image/png" ||
@@ -36,11 +39,13 @@ const fileFilter = (req, file, cb) => {
 };
 app.use(bodyParser.json()); // application/json
 
-app.use(
-  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
-);
+// app.use(
+//   multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+// );
+app.use(multer({ storage: storage, fileFilter: fileFilter }).single("image"));
 
-app.use("/images", express.static(path.join(__dirname, "images")));
+// Middleware ini tidak lagi diperlukan jika gambar tidak disimpan secara lokal
+// app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");

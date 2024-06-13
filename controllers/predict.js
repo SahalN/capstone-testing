@@ -7,6 +7,7 @@ const Result = require("../models/result");
 const User = require("../models/user");
 const generateContentWithLabel = require("../services/geminiResponse");
 const predictClassification = require("../services/inferenceService");
+
 exports.getResults = (req, res, next) => {
   Result.find()
     .then((results) => {
@@ -22,6 +23,7 @@ exports.getResults = (req, res, next) => {
       next(err);
     });
 };
+
 exports.createResult = async (req, res, next) => {
   try {
     // VALIDATION
@@ -37,14 +39,17 @@ exports.createResult = async (req, res, next) => {
       throw error;
     }
     // REPLACE ALL '\' WITH '/'
-    const imageUrl = req.file.path.replace("\\", "/");
+    // const imageUrl = req.file.path.replace("\\", "/");
+    // console.log(imageUrl);
+    const imageUrl = req.file.cloudStoragePublicUrl;
+    console.log(imageUrl);
 
     const { model } = req.app.locals;
 
     // Make prediction using the image file path
     const { confidenceScore, label } = await predictClassification(
       model,
-      req.file.path
+      imageUrl
     );
 
     const userId = req.userId;
@@ -81,6 +86,7 @@ exports.createResult = async (req, res, next) => {
     next(err);
   }
 };
+
 exports.getResult = (req, res, next) => {
   const resultId = req.params.resultId;
   Result.findById(resultId)
@@ -102,6 +108,7 @@ exports.getResult = (req, res, next) => {
       next(err);
     });
 };
+
 exports.deleteResult = (req, res, next) => {
   const resultId = req.params.resultId;
   Result.findById(resultId)
@@ -117,7 +124,7 @@ exports.deleteResult = (req, res, next) => {
         throw error;
       }
       //CHECK LOGGED IN USER
-      clearImage(result.imageUrl);
+      // clearImage(result.imageUrl);
       return Result.findByIdAndDelete(resultId);
     })
     .then((result) => {
@@ -137,7 +144,8 @@ exports.deleteResult = (req, res, next) => {
       next(err);
     });
 };
-const clearImage = (filePath) => {
-  filePath = path.join(__dirname, "..", filePath);
-  fs.unlink(filePath, (err) => console.log(err));
-};
+
+// const clearImage = (filePath) => {
+//   filePath = path.join(__dirname, "..", filePath);
+//   fs.unlink(filePath, (err) => console.log(err));
+// };
