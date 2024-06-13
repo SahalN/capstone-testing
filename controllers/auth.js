@@ -92,7 +92,15 @@ exports.updateProfile = (req, res, next) => {
         throw error;
       }
 
-      if (username) {
+      // Update user fields
+      if (username !== undefined) {
+        if (username.length > 20) {
+          const error = new Error(
+            "Username must be no longer than 20 characters."
+          );
+          error.statusCode = 422;
+          throw error;
+        }
         user.username = username;
       }
       if (dateOfBirth) {

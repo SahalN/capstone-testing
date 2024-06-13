@@ -23,7 +23,12 @@ router.put(
       })
       .normalizeEmail(),
     body("password").trim().isLength({ min: 5 }),
-    body("username").trim().not().isEmpty(),
+    body("username")
+      .trim()
+      .not()
+      .isEmpty()
+      .isLength({ max: 20 })
+      .withMessage("Username must be no longer than 20 characters."),
     body("dateOfBirth")
       .isISO8601()
       .toDate()
