@@ -99,10 +99,7 @@ router.get("/profile", isAuth, (req, res, next) => {
           "User information retrieved successfully. Please update your profile.";
       }
 
-      res.status(200).json({
-        message: message,
-        user: user,
-      });
+      res.status(200).json({ error: false, message: message, user: user });
     })
     .catch((err) => {
       if (!err.statusCode) {
